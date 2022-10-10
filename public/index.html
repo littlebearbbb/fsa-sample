@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      #textarea {
+        display: block;
+        width: 90%;
+        margin: 0 auto;
+        min-height: 600px;
+      }
+      .btn-area {
+        width: 90%;
+        margin: 24px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="btn-area">
+      <button id="open">打开文件</button>
+      <button id="save">保存</button>
+    </div>
+    <textarea id="textarea"></textarea>
+    <script>
+      const $ = (selector) => document.querySelector(selector);
+      let fileHandle;
+
+      $("#open").addEventListener("click", async () => {
+        const pickerOpts = {
+          types: [
+            {
+              description: "Text",
+              accept: { "text/plain": [".txt"] },
+            },
+          ],
+          excludeAcceptAllOption: true,
+          multiple: false,
+        };
+        // open file picker
+        [fileHandle] = await window.showOpenFilePicker(pickerOpts);
+        // get file contents
+        const file = await fileHandle.getFile();
+        const content = await file.text();
+        $("#textarea").innerHTML = content;
+      });
+      $("#save").addEventListener("click", async () => {
+        const writable = await fileHandle.createWritable();
+        // Write the contents of the file to the stream.
+        await writable.write($("#textarea").innerHTML);
+        // Close the file and write the contents to disk.
+        await writable.close();
+      });
+    </script>
+  </body>
+</html>
